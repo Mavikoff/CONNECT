@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import App from './App';
 import NotFound from './pages/NotFound';
@@ -28,27 +28,25 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
 			</div>
 		);
 	}
-	if (!authed) return <Navigate to="/404" replace />;
+	if (!authed) {
+		// если нет сессии и пытаются зайти в /app — показываем нашу 404‑страницу
+		return <NotFound />;
+	}
 	return children;
 }
 
 export default function RootRouter() {
-	// basename берём из BASE_URL Vite: для GitHub Pages это "/CONNECT/"
-	const basename = import.meta.env.BASE_URL.replace(/\/$/, '');
 	return (
-		<BrowserRouter basename={basename}>
+		<HashRouter>
 			<Routes>
-				{/* корень */}
+				{/* стартовая страница */}
 				<Route path="/" element={<Landing />} />
-				<Route path="" element={<Landing />} />
 				{/* защищённое приложение */}
 				<Route path="/app/*" element={<ProtectedRoute><App /></ProtectedRoute>} />
-				{/* явный 404 для защищённых редиректов */}
-				<Route path="/404" element={<NotFound />} />
-				{/* все прочие пути ведут на стартовую страницу */}
-				<Route path="*" element={<Navigate to="/" replace />} />
+				{/* все остальные пути отправляем на лендинг, чтобы GitHub Pages не ломал навигацию */}
+				<Route path="*" element={<Landing />} />
 			</Routes>
-		</BrowserRouter>
+		</HashRouter>
 	);
 }
 

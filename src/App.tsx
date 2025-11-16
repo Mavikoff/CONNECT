@@ -159,13 +159,14 @@ export default function App() {
 		}
 	}, []);
 
-	// Принять демо-параметры из лендинга: /app?demo=1&title=...
+	// Принять демо-параметры из лендинга: #/app?demo=1&title=...
 	useEffect(() => {
 		try {
 			const url = new URL(window.location.href);
-			if (url.pathname.startsWith('/app')) {
-				const isDemo = url.searchParams.get('demo');
-				const titleParam = url.searchParams.get('title') || 'Новая заметка';
+			if (url.hash.startsWith('#/app')) {
+				const hashUrl = new URL(url.hash.substring(1), window.location.origin);
+				const isDemo = hashUrl.searchParams.get('demo');
+				const titleParam = hashUrl.searchParams.get('title') || 'Новая заметка';
 				if (isDemo) {
 					const id = (crypto && 'randomUUID' in crypto) ? (crypto as any).randomUUID() : `${Date.now()}-0000-4000-8000-000000000000`;
 					const name = titleParam.endsWith('.md') ? titleParam : `${titleParam}.md`;
