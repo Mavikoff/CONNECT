@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, SFMono-Regular, Menlo, Monaco,
+    'Cascadia Mono', 'Roboto Mono', monospace;
+  background: linear-gradient(135deg, #0f172a 0%, #0b1120 50%, #000000 100%);
+  color: #f3f4f6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Темы */
+.theme-dark {
+  background: linear-gradient(135deg, #0f172a 0%, #0b1120 50%, #000000 100%);
+  color: #f3f4f6;
+}
+.theme-light {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #ffffff 100%);
+  color: #111827;
+}
+.theme-amoled {
+  background: #000000;
+  color: #e5e7eb;
+}
+
+/* Светлая тема: форсируем читабельный текст поверх темных утилит */
+.theme-light .app-surface, .theme-light .app-surface * {
+  color: #111827;
+}
+.theme-light .app-surface .text-gray-100,
+.theme-light .app-surface .text-gray-200,
+.theme-light .app-surface .text-gray-300,
+.theme-light .app-surface .text-obsidian-muted {
+  color: #111827 !important;
+}
+.theme-light .app-surface .placeholder\:text-obsidian-muted::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Светлая тема - переопределяем тёмные utility-классы на светлые аналоги */
+.theme-light .app-surface [class*="bg-black/30"] { background-color: rgba(255,255,255,0.75) !important; }
+.theme-light .app-surface [class*="bg-black/40"] { background-color: rgba(255,255,255,0.85) !important; }
+.theme-light .app-surface [class*="bg-black/50"] { background-color: rgba(255,255,255,0.9) !important; }
+.theme-light .app-surface [class*="bg-black/60"] { background-color: rgba(255,255,255,0.95) !important; }
+.theme-light .app-surface [class*="bg-black/70"] { background-color: rgba(255,255,255,0.97) !important; }
+.theme-light .app-surface [class*="bg-[#0b0f18]"] { background-color: rgba(255,255,255,0.98) !important; }
+
+.theme-light .app-surface [class*="border-obsidian-border"] { border-color: rgba(17,24,39,0.18) !important; }
+.theme-light .app-surface [class*="divide-obsidian-border"] { border-color: rgba(17,24,39,0.18) !important; }
+.theme-light .app-surface [class*="text-obsidian-muted"] { color: #374151 !important; }
+
+/* Компоненты: статусбар/оверлеи читаемы в светлой теме */
+.theme-light .app-surface .backdrop-blur-lg,
+.theme-light .app-surface .backdrop-blur,
+.theme-light .app-surface .backdrop-blur-sm,
+.theme-light .app-surface .backdrop-blur-md {
+  color: #111827;
+}
+
+@keyframes shine {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.animate-shine {
+  animation: shine 3.5s ease-in-out infinite;
+}
+
+@keyframes caretBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.caret-blink {
+  animation: caretBlink 1s step-end infinite;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.9);
+  border-radius: 6px;
+  border: 2px solid rgba(17, 24, 39, 0.8);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.9);
+}

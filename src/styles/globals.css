@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+	--bg: 255 255 255;
+	--fg: 17 24 39;
+	--muted: 107 114 128;
+	--card: 249 250 251;
+	--border: 229 231 235;
+}
+
+.dark {
+	--bg: 17 24 39;
+	--fg: 243 244 246;
+	--muted: 156 163 175;
+	--card: 31 41 55;
+	--border: 55 65 81;
+}
+
+html,
+body,
+#root {
+	height: 100%;
+}
+
+body {
+	background-color: rgb(var(--bg));
+	color: rgb(var(--fg));
+}
+
+.card-surface {
+	background-color: rgb(var(--card));
+	border: 1px solid rgb(var(--border));
+	border-radius: 0.75rem;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+/* TipTap editor base styles */
+.tiptap {
+	outline: none;
+}
+
+.tiptap p {
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.tiptap h1 { font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; }
+.tiptap h2 { font-size: 1.5rem; line-height: 2rem; font-weight: 700; }
+.tiptap h3 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 600; }
+
+
