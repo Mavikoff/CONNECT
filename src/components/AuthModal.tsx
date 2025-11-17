@@ -53,6 +53,7 @@ export function AuthModal({ open, mode, onClose, onSuccess }: AuthModalProps) {
 					// генерируем дефолтный аватар
 					const avatarDataUrl = generateAvatarDataUrl(firstName || lastName || email, email);
 					// upsert профиль с именем/фамилией и полями шифрования
+					// На HTTP enc_salt будет пустым, master_key_enc будет содержать незашифрованный passphrase
 					const { error: upErr } = await supabase
 						.from('profiles')
 						.upsert({
@@ -60,8 +61,8 @@ export function AuthModal({ open, mode, onClose, onSuccess }: AuthModalProps) {
 							email,
 							first_name: firstName,
 							last_name: lastName,
-							enc_salt: saltB64,
-							master_key_enc: enc,
+							enc_salt: saltB64 || null,
+							master_key_enc: enc || null,
 							avatar_url: avatarDataUrl,
 						}, { onConflict: 'id' });
 					if (upErr) {
@@ -69,9 +70,16 @@ export function AuthModal({ open, mode, onClose, onSuccess }: AuthModalProps) {
 						console.warn('profiles upsert:', upErr.message);
 					}
 					// производный ключ для шифрования заметок из passphrase
-					const encKey = await deriveKey(passphrase, saltB64);
-					const b64 = await exportKeyToB64(encKey);
-					saveSessionKeyInfo(b64, saltB64);
+					// На HTTP encKey будет null, но это нормально - заметки будут храниться без шифрования
+					if (saltB64) {
+						const encKey = await deriveKey(passphrase, saltB64);
+						if (encKey) {
+							const b64 = await exportKeyToB64(encKey);
+							if (b64) {
+								saveSessionKeyInfo(b64, saltB64);
+							}
+						}
+					}
 				}
 			} else {
 				const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -84,12 +92,24 @@ export function AuthModal({ open, mode, onClose, onSuccess }: AuthModalProps) {
 						.select('enc_salt, master_key_enc')
 						.eq('id', user.id)
 						.maybeSingle();
-					if (prof?.enc_salt && prof?.master_key_enc) {
-						const passphrase = await decryptSecretWithPassword(prof.master_key_enc, password, prof.enc_salt);
-						if (passphrase) {
-							const encKey = await deriveKey(passphrase, prof.enc_salt);
-							const b64 = await exportKeyToB64(encKey);
-							saveSessionKeyInfo(b64, prof.enc_salt);
+					// На HTTP enc_salt будет пустым или null, master_key_enc будет содержать незашифрованный passphrase
+					if (prof?.master_key_enc) {
+						if (prof.enc_salt && prof.enc_salt.trim() !== '') {
+							// HTTPS: расшифровываем passphrase
+							const passphrase = await decryptSecretWithPassword(prof.master_key_enc, password, prof.enc_salt);
+							if (passphrase) {
+								const encKey = await deriveKey(passphrase, prof.enc_salt);
+								if (encKey) {
+									const b64 = await exportKeyToB64(encKey);
+									if (b64) {
+										saveSessionKeyInfo(b64, prof.enc_salt);
+									}
+								}
+							}
+						} else {
+							// HTTP: passphrase хранится в открытом виде (небезопасно, но работает)
+							// На HTTP шифрование недоступно, поэтому просто пропускаем
+							console.warn('Encryption not available on HTTP. Notes will be stored unencrypted.');
 						}
 					}
 				}

@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import App from './App';
 import NotFound from './pages/NotFound';
@@ -28,25 +28,20 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
 			</div>
 		);
 	}
-	if (!authed) {
-		// если нет сессии и пытаются зайти в /app — показываем нашу 404‑страницу
-		return <NotFound />;
-	}
+	if (!authed) return <Navigate to="/404" replace />;
 	return children;
 }
 
 export default function RootRouter() {
 	return (
-		<HashRouter>
+		<BrowserRouter>
 			<Routes>
-				{/* стартовая страница */}
 				<Route path="/" element={<Landing />} />
-				{/* защищённое приложение */}
 				<Route path="/app/*" element={<ProtectedRoute><App /></ProtectedRoute>} />
-				{/* все остальные пути отправляем на лендинг, чтобы GitHub Pages не ломал навигацию */}
-				<Route path="*" element={<Landing />} />
+				<Route path="/404" element={<NotFound />} />
+				<Route path="*" element={<NotFound />} />
 			</Routes>
-		</HashRouter>
+		</BrowserRouter>
 	);
 }
 

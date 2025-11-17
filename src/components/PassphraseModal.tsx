@@ -17,12 +17,21 @@ export function PassphraseModal({ open, onClose }: PassphraseModalProps) {
 		e.preventDefault();
 		if (!pass || pass !== confirm) return;
 		setLoading(true);
-		const saltB64 = generateSaltB64();
-		const key = await deriveKey(pass, saltB64);
-		const keyB64 = await exportKeyToB64(key);
-		saveSessionKeyInfo(keyB64, saltB64);
-		setLoading(false);
-		onClose();
+		try {
+			const saltB64 = generateSaltB64();
+			const key = await deriveKey(pass, saltB64);
+			if (key) {
+				const keyB64 = await exportKeyToB64(key);
+				if (keyB64) {
+					saveSessionKeyInfo(keyB64, saltB64);
+				}
+			}
+		} catch (error) {
+			console.warn('PassphraseModal error:', error);
+		} finally {
+			setLoading(false);
+			onClose();
+		}
 	}
 
 	return (
